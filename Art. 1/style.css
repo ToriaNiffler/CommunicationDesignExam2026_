@@ -1,0 +1,183 @@
+:root { --text: #3a2c1a; }
+* { box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: Georgia, "Times New Roman", serif;
+  background: #3d4148;
+}
+
+/* ===== Stone slab as backdrop ===== */
+.backdrop {
+  position: fixed; inset: 0; z-index: -2;
+  background:
+    radial-gradient(ellipse at 25% 15%, rgba(120,128,140,.45), transparent 60%),
+    radial-gradient(ellipse at 80% 85%, rgba(20,22,26,.55), transparent 60%),
+    #3d4148;
+}
+.backdrop::before {
+  content: ""; position: absolute; inset: 0; opacity: .55;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='500' height='500'><filter id='s'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0.85  0 0 0 0 0.87  0 0 0 0 0.9  0 0 0 2.4 -1.3'/></filter><rect width='100%' height='100%' filter='url(%23s)'/></svg>");
+}
+.backdrop::after {
+  content: ""; position: absolute; inset: 0; opacity: .5;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='900'><filter id='m'><feTurbulence type='fractalNoise' baseFrequency='0.003 0.012' numOctaves='4' seed='17'/><feColorMatrix values='0 0 0 0 0.75  0 0 0 0 0.78  0 0 0 0 0.82  0 0 0 3.2 -1.55'/></filter><rect width='100%' height='100%' filter='url(%23m)'/></svg>");
+}
+
+/* ===== A single, centered piece of dough ===== */
+.page {
+  height: 100%; display: flex; align-items: center; justify-content: center;
+  padding: 5vh 5vw;
+}
+.stage {
+  position: relative; isolation: isolate;
+  width: min(780px, 100%);
+  display: grid;                 /* all slides are stacked; the tallest one sets the size */
+}
+.dough {
+  position: absolute; inset: 0; z-index: 0;
+  background:
+    radial-gradient(ellipse at 25% 8%, rgba(255,255,255,.45), transparent 40%),
+    radial-gradient(ellipse at 75% 65%, rgba(190,150,85,.28), transparent 55%),
+    radial-gradient(ellipse at 15% 95%, rgba(255,255,255,.25), transparent 40%),
+    #ecd9b0;
+  border-radius: 110px 70px 130px 80px / 80px 120px 70px 100px;
+  box-shadow:
+    inset 0 0 24px rgba(170,125,60,.15),
+    inset 0 4px 10px rgba(255,255,255,.35),
+    3px 6px 10px rgba(10,12,16,.28);
+  filter: url(#w1);
+  will-change: transform;   /* own layer: the dough isn't repainted on every frame */
+}
+.dough::after {
+  content: ""; position: absolute; inset: 0; opacity: .55; mix-blend-mode: multiply;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.012 0.02' numOctaves='4' seed='7'/><feColorMatrix values='0 0 0 0 0.55  0 0 0 0 0.42  0 0 0 0 0.22  0 0 0 0.9 -0.25'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+/* ===== Slides (only one visible at a time) ===== */
+.slide {
+  grid-area: 1 / 1; z-index: 1; position: relative;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 64px 64px;
+  visibility: hidden;
+}
+.slide.visible { visibility: visible; }
+.content { position: relative; font-size: var(--fs, 1.15rem); line-height: 1.7; }
+.content p { margin: 0 0 1em; position: relative; z-index: 1; }
+.content p:last-child { margin-bottom: 0; }
+
+h1 { font-size: clamp(2.2rem, 7vw, 3.6rem); line-height: 1.1; margin: 0 0 14px; }
+.standfirst { font-size: 1.25em; font-style: italic; margin: 0 !important; }
+h2 { font-size: clamp(1.6rem, 4.5vw, 2.2rem); line-height: 1.15; margin: 0 0 18px; }
+.byline { margin-top: 18px; font-size: .75em; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+
+/* ===== Rolling pin: dark wood, barrel with slim handles and round knobs ===== */
+.rolling-pin {
+  position: absolute; left: -62px; right: -62px; top: 0; height: 64px;
+  pointer-events: none; opacity: 0; z-index: 3;
+  will-change: transform;
+  filter: drop-shadow(0 -3px 4px rgba(20,10,0,.4));
+}
+.rolling-pin .barrel {
+  position: absolute; top: 10px; bottom: 10px; left: 52px; right: 52px;
+  border-radius: 10px;
+  background:
+    linear-gradient(90deg, transparent 3%, rgba(35,18,5,.5) 3% 3.5%, transparent 3.5% 96.5%, rgba(35,18,5,.5) 96.5% 97%, transparent 97%),
+    linear-gradient(180deg, #5a3719, #94602f 28%, #b87f43 50%, #8a5a2c 74%, #4d2e14);
+}
+.rolling-pin .handle {
+  position: absolute; top: 19px; height: 26px; width: 60px;
+  background: linear-gradient(180deg, #5a3719, #94602f 35%, #b87f43 52%, #8a5a2c 75%, #4d2e14);
+}
+.rolling-pin .handle.left {
+  left: 0;
+  clip-path: polygon(0 30%, 5% 12%, 15% 6%, 25% 14%, 31% 32%, 36% 36%, 100% 38%, 100% 62%, 36% 64%, 31% 68%, 25% 86%, 15% 94%, 5% 88%, 0 70%);
+}
+.rolling-pin .handle.right {
+  right: 0;
+  clip-path: polygon(100% 30%, 95% 12%, 85% 6%, 75% 14%, 69% 32%, 64% 36%, 0 38%, 0 62%, 64% 64%, 69% 68%, 75% 86%, 85% 94%, 95% 88%, 100% 70%);
+}
+
+/* ===== Conflict scene: hand-drawn sketch, "drawn in" from left to right ===== */
+.scene { position: relative; margin: 0 0 18px; height: clamp(170px, 34vh, 300px); display: flex; justify-content: center; }
+.scene img { height: 100%; width: auto; max-width: 100%; display: block; opacity: 0; clip-path: inset(0 100% 0 0); }
+.done .scene img { animation: sketch 3.2s cubic-bezier(.45,.05,.35,1) .2s forwards; }
+@keyframes sketch {
+  0%   { opacity: .2; clip-path: inset(0 100% 0 0); }
+  10%  { opacity: 1; }
+  100% { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+/* ===== Effects in the legal section ===== */
+.scales { display: block; margin: 0 auto 12px; width: 100px; height: 84px; color: #5a3b1a; }
+.scales .beam { transform-origin: 60px 24px; animation: sway 3.4s ease-in-out infinite alternate; animation-play-state: paused; }
+.done .scales .beam { animation-play-state: running; }
+@keyframes sway { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+
+.section-sign {
+  position: absolute; z-index: 0; font-size: 120px; font-weight: bold; line-height: 1;
+  color: #c4a468; opacity: 0; pointer-events: none;
+  text-shadow: 1px 1px 0 rgba(255,255,255,.55), -1px -1px 2px rgba(90,55,15,.5);
+}
+.sign-1 { top: -40px; right: -26px; --r: 10deg;  --d: .2s; }
+.sign-2 { bottom: 70px; left: -40px; --r: -14deg; --d: .7s; }
+.sign-3 { bottom: -44px; right: 40px; --r: 6deg;   --d: 1.2s; }
+.done .section-sign { animation: stamp .5s cubic-bezier(.2,.9,.3,1.15) forwards; animation-delay: var(--d); }
+@keyframes stamp {
+  0%   { opacity: 0;   transform: scale(2.4) rotate(var(--r)); }
+  70%  { opacity: .75; transform: scale(.93) rotate(var(--r)); }
+  100% { opacity: .6;  transform: scale(1) rotate(var(--r)); }
+}
+
+.law {
+  color: inherit; padding: 0 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  background: linear-gradient(transparent 50%, rgba(205,70,45,.42) 50% 94%, transparent 94%) no-repeat 0 0 / 0% 100%;
+}
+.done .law { animation: highlight .9s ease-out forwards; animation-delay: calc(var(--i) * .55s + .3s); }
+@keyframes highlight { to { background-size: 100% 100%; } }
+
+/* ===== Controls ===== */
+#soundButton {
+  position: fixed; right: 16px; bottom: 16px; z-index: 10;
+  font: inherit; font-size: .9rem; color: #3a2c1a; cursor: pointer;
+  padding: 8px 14px; border-radius: 999px; border: 0;
+  background: #ecd9b0; box-shadow: 0 4px 12px rgba(10,12,16,.5);
+}
+#soundButton:hover { background: #f4e6c4; }
+
+.dots {
+  position: fixed; right: 18px; top: 50%; transform: translateY(-50%); z-index: 10;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.dots button {
+  width: 12px; height: 12px; padding: 0; border-radius: 50%; cursor: pointer;
+  border: 2px solid #ecd9b0; background: transparent; opacity: .6;
+}
+.dots button.active { background: #ecd9b0; opacity: 1; }
+
+.hint {
+  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 10;
+  color: #ecd9b0; font-size: .9rem; letter-spacing: .04em; opacity: .85;
+  transition: opacity .8s; pointer-events: none; text-align: center;
+}
+.hint.gone { opacity: 0; }
+.footer-note {
+  position: fixed; left: 16px; bottom: 16px; z-index: 10; max-width: 30vw;
+  font-size: .75rem; color: #ecd9b0; opacity: .6; line-height: 1.3;
+}
+
+@media (max-width: 700px) {
+  .slide { padding: 44px 30px; }
+  .footer-note { display: none; }
+  .hint { bottom: 70px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rolling-pin { display: none; }
+  .section-sign { opacity: .6; animation: none !important; transform: rotate(var(--r)); }
+  .law { background-size: 100% 100%; animation: none !important; }
+  .scales .beam { animation: none; }
+  .scene img { opacity: 1; clip-path: none; animation: none !important; }
+}
